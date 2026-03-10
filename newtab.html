@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>trend-feed</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">New tab dashboard</p>
+          <h1>trend-feed</h1>
+          <p class="hero-copy">
+            Watch what is rising across GitHub, Hacker News, and your RSS feeds in one place.
+          </p>
+        </div>
+        <div class="hero-meta">
+          <div class="meta-chip">
+            <span class="meta-label">Updated</span>
+            <strong id="last-updated">Loading...</strong>
+          </div>
+          <button id="refresh-button" class="refresh-button" type="button">Refresh</button>
+        </div>
+      </header>
+
+      <main class="dashboard">
+        <section class="panel panel-wide">
+          <div class="panel-header">
+            <div>
+              <p class="panel-kicker">Curated trend watch</p>
+              <h2>Sources</h2>
+            </div>
+            <p class="panel-note">Starter version with hardcoded feeds and direct fetchers.</p>
+          </div>
+          <div id="status-banner" class="status-banner">Fetching dashboard data...</div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="panel-kicker">Code</p>
+              <h2>GitHub Trending</h2>
+            </div>
+          </div>
+          <div id="github-list" class="card-list"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="panel-kicker">Discussion</p>
+              <h2>Hacker News</h2>
+            </div>
+          </div>
+          <div id="hn-list" class="card-list"></div>
+        </section>
+
+        <section class="panel panel-wide">
+          <div class="panel-header">
+            <div>
+              <p class="panel-kicker">Reading</p>
+              <h2>RSS Feeds</h2>
+            </div>
+          </div>
+          <div id="rss-grid" class="rss-grid"></div>
+        </section>
+      </main>
+    </div>
+
+    <template id="item-template">
+      <article class="item-card">
+        <div class="item-topline"></div>
+        <a class="item-link" target="_blank" rel="noreferrer"></a>
+        <p class="item-summary"></p>
+        <div class="item-meta"></div>
+      </article>
+    </template>
+
+    <template id="rss-template">
+      <section class="rss-card">
+        <div class="rss-card-header">
+          <h3></h3>
+          <a class="rss-source-link" target="_blank" rel="noreferrer">Open feed</a>
+        </div>
+        <div class="rss-items"></div>
+      </section>
+    </template>
+
+    <script type="module" src="./src/newtab.js"></script>
+  </body>
+</html>
