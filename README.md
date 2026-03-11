@@ -13,6 +13,8 @@ This starter is intentionally simple:
 - Manifest V3 extension
 - No build step
 - New tab override
+- Extension popup for adding and deleting RSS feed links
+- `chrome.storage.local` for saved RSS feeds
 - Client-side fetchers for GitHub Trending, Hacker News, and RSS XML
 - Responsive dashboard UI
 

@@ -1,3 +1,8 @@
+import {
+  RSS_STORAGE_KEY,
+  loadStoredRssFeeds
+} from "./storage.js";
+
 const FEED_CONFIG = {
   githubTrending: {
     title: "GitHub Trending",
@@ -8,17 +13,7 @@ const FEED_CONFIG = {
     title: "Hacker News",
     url: "https://news.ycombinator.com/",
     limit: 8
-  },
-  rssFeeds: [
-    {
-      title: "GitHub Blog",
-      url: "https://github.blog/feed/"
-    },
-    {
-      title: "Hacker News Frontpage",
-      url: "https://hnrss.org/frontpage"
-    }
-  ]
+  }
 };
 
 const els = {
@@ -26,6 +21,7 @@ const els = {
   githubList: document.querySelector("#github-list"),
   hnList: document.querySelector("#hn-list"),
   rssGrid: document.querySelector("#rss-grid"),
+  rssCount: document.querySelector("#rss-count"),
   statusBanner: document.querySelector("#status-banner"),
   lastUpdated: document.querySelector("#last-updated"),
   itemTemplate: document.querySelector("#item-template"),
@@ -36,16 +32,24 @@ els.refreshButton.addEventListener("click", () => {
   void loadDashboard();
 });
 
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName === "local" && changes[RSS_STORAGE_KEY]) {
+    void loadDashboard();
+  }
+});
+
 void loadDashboard();
 
 async function loadDashboard() {
   setStatus("Fetching dashboard data...", "loading");
   setTimestamp();
+  const rssFeeds = await loadStoredRssFeeds();
+  updateRssCount(rssFeeds.length);
 
   const results = await Promise.allSettled([
     fetchGitHubTrending(FEED_CONFIG.githubTrending),
     fetchHackerNews(FEED_CONFIG.hackerNews),
-    fetchRssFeeds(FEED_CONFIG.rssFeeds)
+    fetchRssFeeds(rssFeeds)
   ]);
 
   const [githubResult, hnResult, rssResult] = results;
@@ -145,6 +149,10 @@ async function fetchHackerNews(config) {
 }
 
 async function fetchRssFeeds(feeds) {
+  if (feeds.length === 0) {
+    return [];
+  }
+
   return Promise.all(
     feeds.map(async (feed) => {
       const response = await fetch(feed.url);
@@ -200,7 +208,7 @@ function renderRssGrid(feeds) {
   els.rssGrid.innerHTML = "";
 
   if (feeds.length === 0) {
-    renderEmptyState(els.rssGrid, "No RSS feeds configured.");
+    renderEmptyState(els.rssGrid, "No RSS feeds saved yet. Add some from the extension popup.");
     return;
   }
 
@@ -245,6 +253,10 @@ function renderErrorState(container, message) {
 function setStatus(message, tone) {
   els.statusBanner.textContent = message;
   els.statusBanner.dataset.tone = tone;
+}
+
+function updateRssCount(count) {
+  els.rssCount.textContent = `${count} ${count === 1 ? "feed" : "feeds"} saved`;
 }
 
 function setTimestamp(date = new Date()) {

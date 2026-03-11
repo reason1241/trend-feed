@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>trend-feed feeds</title>
+    <link rel="stylesheet" href="./src/popup.css" />
+  </head>
+  <body>
+    <main class="popup-shell">
+      <header class="popup-header">
+        <p class="popup-kicker">RSS manager</p>
+        <h1>trend-feed</h1>
+        <p class="popup-copy">Add or delete RSS feed links for your new tab dashboard.</p>
+      </header>
+
+      <form id="feed-form" class="feed-form">
+        <label class="field">
+          <span>Name</span>
+          <input id="feed-title" name="title" type="text" placeholder="GitHub Blog" required />
+        </label>
+        <label class="field">
+          <span>RSS URL</span>
+          <input
+            id="feed-url"
+            name="url"
+            type="url"
+            placeholder="https://example.com/feed.xml"
+            required
+          />
+        </label>
+        <button class="primary-button" type="submit">Add feed</button>
+      </form>
+
+      <section class="feed-list-section">
+        <div class="list-header">
+          <h2>Saved feeds</h2>
+          <span id="feed-count" class="feed-count">0</span>
+        </div>
+        <div id="form-status" class="form-status" aria-live="polite"></div>
+        <div id="saved-feeds" class="saved-feeds"></div>
+      </section>
+    </main>
+
+    <template id="saved-feed-template">
+      <article class="saved-feed-card">
+        <div class="saved-feed-copy">
+          <strong class="saved-feed-title"></strong>
+          <a class="saved-feed-url" target="_blank" rel="noreferrer"></a>
+        </div>
+        <button class="delete-button" type="button">Delete</button>
+      </article>
+    </template>
+
+    <script type="module" src="./src/popup.js"></script>
+  </body>
+</html>
