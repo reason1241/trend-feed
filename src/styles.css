@@ -215,14 +215,31 @@ h1 {
 
 .rss-grid {
   display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(320px, 360px);
   gap: 14px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  min-height: 0;
+  flex: 1;
+  padding-right: 6px;
+  padding-bottom: 4px;
+  align-content: stretch;
+  scroll-snap-type: x proximity;
 }
 
 .rss-card {
-  padding: 16px;
+  padding: 0;
   border-radius: var(--radius-md);
   background: var(--surface-strong);
   border: 1px solid var(--border);
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  scroll-snap-align: start;
 }
 
 .rss-source-link,
@@ -236,20 +253,19 @@ h1 {
   color: var(--muted);
 }
 
-.rss-grid {
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  overflow: auto;
-  min-height: 0;
-  padding-right: 6px;
-  align-content: start;
-}
-
 .rss-card-header {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 0;
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-strong);
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .rss-source-link {
@@ -260,6 +276,10 @@ h1 {
 .rss-items {
   display: grid;
   gap: 10px;
+  padding: 14px 16px 16px;
+  overflow-y: auto;
+  min-height: 0;
+  align-content: start;
 }
 
 .rss-item {
