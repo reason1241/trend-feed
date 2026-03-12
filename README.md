@@ -1,10 +1,6 @@
 # trend-feed
 
-A Chrome extension that replaces the default new tab page with a dashboard for:
-
-- GitHub Trending
-- Hacker News
-- RSS feeds
+A Chrome extension that replaces the default new tab page with an RSS feed dashboard.
 
 ## Current scope
 
@@ -15,7 +11,7 @@ This starter is intentionally simple:
 - New tab override
 - Extension popup for adding and deleting RSS feed links
 - `chrome.storage.local` for saved RSS feeds
-- Client-side fetchers for GitHub Trending, Hacker News, and RSS XML
+- Client-side RSS XML fetching and rendering
 - Responsive dashboard UI
 
 ## Load in Chrome
@@ -34,7 +30,6 @@ This starter is intentionally simple:
 
 ## Next steps
 
-- Add source configuration UI with `chrome.storage`
-- Add category/filter support for GitHub Trending
+- Add feed health/error details in the popup
 - Add saved feed presets
-- Add card layouts and drag/drop customization
+- Add layout customization and pinning

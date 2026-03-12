@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "trend-feed",
   "version": "0.1.0",
-  "description": "A Chrome new tab dashboard for GitHub Trending, Hacker News, and RSS feeds.",
+  "description": "A Chrome new tab RSS dashboard with a simple feed manager.",
   "permissions": [
     "storage"
   ],
@@ -11,9 +11,6 @@
     "default_popup": "popup.html"
   },
   "host_permissions": [
-    "https://github.com/*",
-    "https://news.ycombinator.com/*",
-    "https://hnrss.org/*",
     "https://*/*",
     "http://*/*"
   ],
