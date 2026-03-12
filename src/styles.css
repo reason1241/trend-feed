@@ -104,12 +104,12 @@ h1 {
   justify-content: flex-end;
 }
 
-.meta-chip,
+.control-chip,
 .refresh-button {
   background: var(--surface);
 }
 
-.meta-chip {
+.control-chip {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -118,6 +118,23 @@ h1 {
   border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--surface);
+}
+
+.control-chip strong,
+.control-chip select {
+  font: inherit;
+  color: var(--text);
+}
+
+.control-chip-select {
+  min-width: 190px;
+}
+
+.control-chip select {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  outline: none;
 }
 
 .meta-label {
@@ -182,21 +199,16 @@ h1 {
   text-align: right;
 }
 
-.status-banner {
-  padding: 10px 14px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background: var(--surface-strong);
-  max-width: 260px;
+#status-banner {
   font-size: 0.92rem;
 }
 
-.status-banner[data-tone="success"] {
+.control-chip[data-tone="success"] {
   color: var(--success);
   border-color: rgba(97, 119, 79, 0.24);
 }
 
-.status-banner[data-tone="warning"] {
+.control-chip[data-tone="warning"] {
   color: var(--warning);
   border-color: rgba(156, 101, 65, 0.24);
 }
@@ -323,10 +335,9 @@ h1 {
     padding: 16px;
   }
 
-  .meta-chip,
+  .control-chip,
   .refresh-button,
-  .status-banner {
+  .control-chip-select {
     width: 100%;
-    max-width: none;
   }
 }

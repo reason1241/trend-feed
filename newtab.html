@@ -10,18 +10,25 @@
     <div class="page-shell">
       <header class="hero">
         <div class="hero-copy-block">
-          <p class="eyebrow">RSS dashboard</p>
           <h1>Trend Feed</h1>
           <p class="hero-copy">
             A focused RSS feed dashboard for your new tab page.
           </p>
         </div>
         <div class="hero-meta">
-          <div class="meta-chip">
+          <label class="control-chip control-chip-select" for="date-filter">
+            <span class="meta-label">Published</span>
+            <select id="date-filter">
+              <option value="none">No filter</option>
+              <option value="today">Today only</option>
+              <option value="last_2_days">Today to yesterday</option>
+              <option value="last_7_days">Today to 7 days ago</option>
+            </select>
+          </label>
+          <div id="status-chip" class="control-chip">
             <span class="meta-label">Updated</span>
-            <strong id="last-updated">Loading...</strong>
+            <strong id="status-banner">Fetching RSS feeds...</strong>
           </div>
-          <div id="status-banner" class="status-banner">Fetching RSS feeds...</div>
           <button id="refresh-button" class="refresh-button" type="button">Refresh</button>
         </div>
       </header>

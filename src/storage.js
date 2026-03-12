@@ -1,4 +1,6 @@
 export const RSS_STORAGE_KEY = "rssFeeds";
+export const RSS_DATE_FILTER_KEY = "rssDateFilter";
+export const DEFAULT_RSS_DATE_FILTER = "none";
 
 export const DEFAULT_RSS_FEEDS = [
   {
@@ -33,6 +35,28 @@ export async function saveStoredRssFeeds(feeds) {
   return sanitizedFeeds;
 }
 
+export async function loadRssDateFilter() {
+  const result = await chrome.storage.local.get(RSS_DATE_FILTER_KEY);
+  const filter = result[RSS_DATE_FILTER_KEY];
+
+  if (!isValidDateFilter(filter)) {
+    await chrome.storage.local.set({
+      [RSS_DATE_FILTER_KEY]: DEFAULT_RSS_DATE_FILTER
+    });
+    return DEFAULT_RSS_DATE_FILTER;
+  }
+
+  return filter;
+}
+
+export async function saveRssDateFilter(filter) {
+  const nextFilter = isValidDateFilter(filter) ? filter : DEFAULT_RSS_DATE_FILTER;
+  await chrome.storage.local.set({
+    [RSS_DATE_FILTER_KEY]: nextFilter
+  });
+  return nextFilter;
+}
+
 function isValidFeedRecord(feed) {
   return Boolean(
     feed &&
@@ -41,4 +65,8 @@ function isValidFeedRecord(feed) {
       typeof feed.url === "string" &&
       feed.url.trim()
   );
+}
+
+function isValidDateFilter(filter) {
+  return ["none", "today", "last_2_days", "last_7_days"].includes(filter);
 }
