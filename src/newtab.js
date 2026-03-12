@@ -57,7 +57,7 @@ async function fetchRssFeeds(feeds) {
 
       const xml = await response.text();
       const doc = new DOMParser().parseFromString(xml, "text/xml");
-      const items = [...doc.querySelectorAll("item")].slice(0, 4);
+      const items = [...doc.querySelectorAll("item")];
 
       return {
         title: feed.title,
