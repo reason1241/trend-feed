@@ -6,12 +6,16 @@ export const DEFAULT_THEME_MODE = "light";
 
 export const DEFAULT_RSS_FEEDS = [
   {
-    title: "GitHub Blog",
-    url: "https://github.blog/feed/"
+    title: "BBC World News",
+    url: "https://feeds.bbci.co.uk/news/world/rss.xml"
   },
   {
-    title: "Hacker News Frontpage",
-    url: "https://hnrss.org/frontpage"
+    title: "Market Watch",
+    url: "https://feeds.content.dowjones.io/public/rss/mw_topstories"
+  },
+  {
+    title: "Investing Crypto News",
+    url: "https://www.investing.com/rss/news_301.rss"
   }
 ];
 
