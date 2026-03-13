@@ -6,7 +6,19 @@
   "permissions": [
     "storage"
   ],
+  "icons": {
+    "16": "icons/favicon-16x16.png",
+    "32": "icons/favicon-32x32.png",
+    "48": "icons/favicon-48x48.png",
+    "128": "icons/favicon-128x128.png"
+  },
   "action": {
+    "default_icon": {
+      "16": "icons/favicon-16x16.png",
+      "32": "icons/favicon-32x32.png",
+      "48": "icons/favicon-48x48.png",
+      "128": "icons/favicon-128x128.png"
+    },
     "default_title": "Manage RSS feeds",
     "default_popup": "popup.html"
   },
