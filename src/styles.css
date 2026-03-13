@@ -156,6 +156,14 @@ h1 {
   min-width: 190px;
 }
 
+.select-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+
 .control-chip-status {
   min-width: 220px;
   flex-direction: row;
@@ -228,6 +236,19 @@ h1 {
   outline: none;
   appearance: none;
   cursor: pointer;
+  min-width: 0;
+  flex: 1;
+}
+
+.select-arrow {
+  width: 10px;
+  height: 10px;
+  border-right: 1.5px solid var(--muted);
+  border-bottom: 1.5px solid var(--muted);
+  transform: rotate(45deg) translateY(-2px);
+  flex-shrink: 0;
+  margin-right: 2px;
+  pointer-events: none;
 }
 
 .meta-label {

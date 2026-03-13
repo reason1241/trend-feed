@@ -18,12 +18,15 @@
         <div class="hero-meta">
           <label class="control-chip control-chip-select" for="date-filter">
             <span class="meta-label">Published</span>
-            <select id="date-filter">
-              <option value="none">No filter</option>
-              <option value="today">Today only</option>
-              <option value="last_2_days">Today to yesterday</option>
-              <option value="last_7_days">Today to 7 days ago</option>
-            </select>
+            <span class="select-wrap">
+              <select id="date-filter">
+                <option value="none">No filter</option>
+                <option value="today">Today only</option>
+                <option value="last_2_days">Today to yesterday</option>
+                <option value="last_7_days">Today to 7 days ago</option>
+              </select>
+              <span class="select-arrow" aria-hidden="true"></span>
+            </span>
           </label>
           <div id="status-chip" class="control-chip control-chip-status">
             <div class="chip-copy">

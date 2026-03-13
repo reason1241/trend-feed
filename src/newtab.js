@@ -10,6 +10,7 @@ import {
 } from "./storage.js";
 
 const els = {
+  dateFilterChip: document.querySelector(".control-chip-select"),
   dateFilter: document.querySelector("#date-filter"),
   refreshButton: document.querySelector("#refresh-button"),
   rssGrid: document.querySelector("#rss-grid"),
@@ -31,6 +32,14 @@ els.dateFilter.addEventListener("change", async () => {
   const nextFilter = await saveRssDateFilter(els.dateFilter.value);
   els.dateFilter.value = nextFilter;
   void loadDashboard();
+});
+
+els.dateFilterChip.addEventListener("click", (event) => {
+  if (event.target === els.dateFilter) {
+    return;
+  }
+
+  openDateFilter();
 });
 
 els.refreshButton.addEventListener("click", () => {
@@ -185,6 +194,16 @@ function formatTimestamp(date = new Date()) {
 function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
   els.themeToggle.checked = theme === "dark";
+}
+
+function openDateFilter() {
+  if (typeof els.dateFilter.showPicker === "function") {
+    els.dateFilter.showPicker();
+    return;
+  }
+
+  els.dateFilter.focus();
+  els.dateFilter.click();
 }
 
 function normalizeWhitespace(value) {
