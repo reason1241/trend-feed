@@ -2,7 +2,10 @@ import {
   RSS_DATE_FILTER_KEY,
   RSS_STORAGE_KEY,
   loadRssDateFilter,
+  loadThemeMode,
   saveRssDateFilter,
+  saveThemeMode,
+  THEME_STORAGE_KEY,
   loadStoredRssFeeds
 } from "./storage.js";
 
@@ -13,8 +16,16 @@ const els = {
   rssCount: document.querySelector("#rss-count"),
   statusChip: document.querySelector("#status-chip"),
   statusBanner: document.querySelector("#status-banner"),
+  themeToggle: document.querySelector("#theme-toggle"),
   rssTemplate: document.querySelector("#rss-template")
 };
+
+void init();
+
+async function init() {
+  applyTheme(await loadThemeMode());
+  await loadDashboard();
+}
 
 els.dateFilter.addEventListener("change", async () => {
   const nextFilter = await saveRssDateFilter(els.dateFilter.value);
@@ -26,13 +37,20 @@ els.refreshButton.addEventListener("click", () => {
   void loadDashboard();
 });
 
+els.themeToggle.addEventListener("change", async () => {
+  const nextTheme = els.themeToggle.checked ? "dark" : "light";
+  applyTheme(await saveThemeMode(nextTheme));
+});
+
 chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName === "local" && changes[THEME_STORAGE_KEY]) {
+    applyTheme(changes[THEME_STORAGE_KEY].newValue || "light");
+  }
+
   if (areaName === "local" && (changes[RSS_STORAGE_KEY] || changes[RSS_DATE_FILTER_KEY])) {
     void loadDashboard();
   }
 });
-
-void loadDashboard();
 
 async function loadDashboard() {
   const dateFilter = await loadRssDateFilter();
@@ -148,8 +166,9 @@ function renderErrorState(container, message) {
 }
 
 function setStatus(message, tone) {
-  els.statusBanner.textContent = `${message} · ${formatTimestamp(new Date())}`;
+  els.statusBanner.textContent = formatTimestamp(new Date());
   els.statusChip.dataset.tone = tone;
+  els.statusChip.title = message;
 }
 
 function updateRssCount(count) {
@@ -161,6 +180,11 @@ function formatTimestamp(date = new Date()) {
     hour: "2-digit",
     minute: "2-digit"
   });
+}
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  els.themeToggle.checked = theme === "dark";
 }
 
 function normalizeWhitespace(value) {

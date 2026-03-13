@@ -1,6 +1,8 @@
 export const RSS_STORAGE_KEY = "rssFeeds";
 export const RSS_DATE_FILTER_KEY = "rssDateFilter";
 export const DEFAULT_RSS_DATE_FILTER = "none";
+export const THEME_STORAGE_KEY = "themeMode";
+export const DEFAULT_THEME_MODE = "light";
 
 export const DEFAULT_RSS_FEEDS = [
   {
@@ -57,6 +59,28 @@ export async function saveRssDateFilter(filter) {
   return nextFilter;
 }
 
+export async function loadThemeMode() {
+  const result = await chrome.storage.local.get(THEME_STORAGE_KEY);
+  const theme = result[THEME_STORAGE_KEY];
+
+  if (!isValidThemeMode(theme)) {
+    await chrome.storage.local.set({
+      [THEME_STORAGE_KEY]: DEFAULT_THEME_MODE
+    });
+    return DEFAULT_THEME_MODE;
+  }
+
+  return theme;
+}
+
+export async function saveThemeMode(theme) {
+  const nextTheme = isValidThemeMode(theme) ? theme : DEFAULT_THEME_MODE;
+  await chrome.storage.local.set({
+    [THEME_STORAGE_KEY]: nextTheme
+  });
+  return nextTheme;
+}
+
 function isValidFeedRecord(feed) {
   return Boolean(
     feed &&
@@ -69,4 +93,8 @@ function isValidFeedRecord(feed) {
 
 function isValidDateFilter(filter) {
   return ["none", "today", "last_2_days", "last_7_days"].includes(filter);
+}
+
+function isValidThemeMode(theme) {
+  return ["light", "dark"].includes(theme);
 }

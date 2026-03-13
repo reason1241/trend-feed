@@ -25,11 +25,22 @@
               <option value="last_7_days">Today to 7 days ago</option>
             </select>
           </label>
-          <div id="status-chip" class="control-chip">
-            <span class="meta-label">Updated</span>
-            <strong id="status-banner">Fetching RSS feeds...</strong>
+          <div id="status-chip" class="control-chip control-chip-status">
+            <div class="chip-copy">
+              <span class="meta-label">Updated</span>
+              <strong id="status-banner">--:--</strong>
+            </div>
+            <button id="refresh-button" class="chip-button" type="button">Refresh</button>
           </div>
-          <button id="refresh-button" class="refresh-button" type="button">Refresh</button>
+          <label class="control-chip control-chip-toggle" for="theme-toggle">
+            <span class="meta-label">Dark mode</span>
+            <span class="switch" aria-hidden="true">
+              <input id="theme-toggle" type="checkbox" />
+              <span class="switch-track">
+                <span class="switch-thumb"></span>
+              </span>
+            </span>
+          </label>
         </div>
       </header>
 
