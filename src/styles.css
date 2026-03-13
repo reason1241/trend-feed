@@ -156,7 +156,7 @@ h1 {
 }
 
 .hero-meta {
-  display: none;
+  display: flex;
   gap: 10px;
   align-items: center;
   flex-wrap: wrap;
@@ -522,6 +522,7 @@ h1 {
   }
 
   .hero-meta {
+    display: none;
     position: absolute;
     top: calc(100% + 8px);
     right: 0;
