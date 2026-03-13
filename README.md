@@ -2,6 +2,12 @@
 
 A Chrome extension that replaces the default new tab page with an RSS feed dashboard.
 
+## Screenshot
+- Default
+![alt text](image-1.png)
+- Dark mode
+![alt text](image.png)
+
 ## Current scope
 
 This starter is intentionally simple:
