@@ -12,6 +12,8 @@ import {
 const els = {
   dateFilterChip: document.querySelector(".control-chip-select"),
   dateFilter: document.querySelector("#date-filter"),
+  heroMeta: document.querySelector("#hero-meta"),
+  menuToggle: document.querySelector("#menu-toggle"),
   refreshButton: document.querySelector("#refresh-button"),
   rssGrid: document.querySelector("#rss-grid"),
   rssCount: document.querySelector("#rss-count"),
@@ -21,10 +23,13 @@ const els = {
   rssTemplate: document.querySelector("#rss-template")
 };
 
+const mobileMenuQuery = window.matchMedia("(max-width: 1100px)");
+
 void init();
 
 async function init() {
   applyTheme(await loadThemeMode());
+  syncHeaderMenu();
   await loadDashboard();
 }
 
@@ -46,9 +51,39 @@ els.refreshButton.addEventListener("click", () => {
   void loadDashboard();
 });
 
+els.menuToggle.addEventListener("click", () => {
+  if (!mobileMenuQuery.matches) {
+    return;
+  }
+
+  const isOpen = els.heroMeta.classList.toggle("is-open");
+  els.heroMeta.hidden = !isOpen;
+  els.menuToggle.setAttribute("aria-expanded", String(isOpen));
+});
+
 els.themeToggle.addEventListener("change", async () => {
   const nextTheme = els.themeToggle.checked ? "dark" : "light";
   applyTheme(await saveThemeMode(nextTheme));
+});
+
+mobileMenuQuery.addEventListener("change", () => {
+  syncHeaderMenu();
+});
+
+document.addEventListener("click", (event) => {
+  if (!mobileMenuQuery.matches) {
+    return;
+  }
+
+  if (
+    els.heroMeta.classList.contains("is-open") &&
+    !els.heroMeta.contains(event.target) &&
+    !els.menuToggle.contains(event.target)
+  ) {
+    els.heroMeta.classList.remove("is-open");
+    els.heroMeta.hidden = true;
+    els.menuToggle.setAttribute("aria-expanded", "false");
+  }
 });
 
 chrome.storage.onChanged.addListener((changes, areaName) => {
@@ -194,6 +229,19 @@ function formatTimestamp(date = new Date()) {
 function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
   els.themeToggle.checked = theme === "dark";
+}
+
+function syncHeaderMenu() {
+  if (mobileMenuQuery.matches) {
+    els.heroMeta.hidden = !els.heroMeta.classList.contains("is-open");
+    els.menuToggle.hidden = false;
+    return;
+  }
+
+  els.heroMeta.hidden = false;
+  els.heroMeta.classList.remove("is-open");
+  els.menuToggle.hidden = true;
+  els.menuToggle.setAttribute("aria-expanded", "false");
 }
 
 function openDateFilter() {

@@ -88,8 +88,9 @@ body::before {
   display: flex;
   justify-content: space-between;
   gap: 16px;
-  align-items: center;
+  align-items: flex-start;
   flex-shrink: 0;
+  position: relative;
 }
 
 .eyebrow,
@@ -103,6 +104,35 @@ body::before {
 
 .hero-copy-block {
   min-width: 0;
+  text-align: left;
+}
+
+.menu-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 4;
+}
+
+.menu-icon {
+  display: inline-grid;
+  gap: 4px;
+}
+
+.menu-icon span {
+  width: 14px;
+  height: 1.5px;
+  background: currentColor;
+  border-radius: 999px;
 }
 
 h1,
@@ -126,7 +156,7 @@ h1 {
 }
 
 .hero-meta {
-  display: flex;
+  display: none;
   gap: 10px;
   align-items: center;
   flex-wrap: wrap;
@@ -417,6 +447,10 @@ h1 {
   background: #eee3be;
 }
 
+:root[data-theme="dark"] .rss-item:hover {
+  background: #4a3d2d;
+}
+
 .rss-item strong,
 .rss-item span {
   min-width: 0;
@@ -451,7 +485,6 @@ h1 {
 }
 
 @media (max-width: 960px) {
-  .hero,
   .panel-header {
     flex-direction: column;
   }
@@ -467,6 +500,52 @@ h1 {
 
   .control-chip-status {
     width: 100%;
+  }
+}
+
+@media (max-width: 1100px) {
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+  }
+
+  .hero-copy-block {
+    width: 100%;
+    grid-column: 1 / 2;
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+    grid-column: 2 / 3;
+    justify-self: end;
+  }
+
+  .hero-meta {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 3;
+    width: min(280px, calc(100vw - 32px));
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero-meta.is-open {
+    display: flex;
+  }
+
+  .control-chip,
+  .control-chip-select,
+  .control-chip-toggle,
+  .control-chip-status {
+    width: 100%;
+    min-width: 0;
   }
 }
 

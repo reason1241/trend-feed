@@ -18,7 +18,21 @@
             A focused RSS feed dashboard for your new tab page.
           </p>
         </div>
-        <div class="hero-meta">
+        <button
+          id="menu-toggle"
+          class="menu-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="hero-meta"
+          aria-label="Toggle controls"
+        >
+          <span class="menu-icon" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        </button>
+        <div id="hero-meta" class="hero-meta">
           <label class="control-chip control-chip-select" for="date-filter">
             <span class="meta-label">Published</span>
             <span class="select-wrap">
