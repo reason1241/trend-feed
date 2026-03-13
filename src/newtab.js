@@ -24,6 +24,7 @@ const els = {
 };
 
 const mobileMenuQuery = window.matchMedia("(max-width: 1100px)");
+let activeDashboardRequestId = 0;
 
 void init();
 
@@ -97,13 +98,51 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
 });
 
 async function loadDashboard() {
+  const requestId = ++activeDashboardRequestId;
   const dateFilter = await loadRssDateFilter();
+
+  if (requestId !== activeDashboardRequestId) {
+    return;
+  }
+
   els.dateFilter.value = dateFilter;
   setStatus("Fetching RSS feeds", "loading");
   const rssFeeds = await loadStoredRssFeeds();
+
+  if (requestId !== activeDashboardRequestId) {
+    return;
+  }
+
   updateRssCount(rssFeeds.length);
-  const rssResult = await fetchRssFeeds(rssFeeds, dateFilter);
-  renderRssGrid(rssResult.feeds);
+
+  if (rssFeeds.length === 0) {
+    renderEmptyState(els.rssGrid, "No RSS feeds saved yet. Add some from the extension popup.");
+    setStatus("Updated", "success");
+    return;
+  }
+
+  const cardMap = renderRssGrid(rssFeeds, { loading: true });
+
+  const rssResult = await fetchRssFeeds(rssFeeds, dateFilter, {
+    onFeedLoaded(feed, index) {
+      if (requestId !== activeDashboardRequestId) {
+        return;
+      }
+
+      updateRssFeedCard(cardMap.get(index), feed);
+    },
+    onFeedFailed(feed, index) {
+      if (requestId !== activeDashboardRequestId) {
+        return;
+      }
+
+      updateRssFeedCardError(cardMap.get(index), feed);
+    }
+  });
+
+  if (requestId !== activeDashboardRequestId) {
+    return;
+  }
 
   if (rssResult.failedCount === 0) {
     setStatus("Updated", "success");
@@ -113,43 +152,24 @@ async function loadDashboard() {
   setStatus(`${rssResult.failedCount} feeds failed to load`, "warning");
 }
 
-async function fetchRssFeeds(feeds, dateFilter) {
+async function fetchRssFeeds(feeds, dateFilter, { onFeedLoaded, onFeedFailed } = {}) {
   if (feeds.length === 0) {
     return { feeds: [], failedCount: 0 };
   }
 
-  const results = await Promise.allSettled(
-    feeds.map(async (feed) => {
-      const response = await fetch(feed.url);
-
-      if (!response.ok) {
-        throw new Error(`RSS request failed for ${feed.title} with status ${response.status}`);
-      }
-
-      const xml = await response.text();
-      const doc = new DOMParser().parseFromString(xml, "text/xml");
-      const items = getFeedEntries(doc);
-
-      return {
-        title: feed.title,
-        url: feed.url,
-        items: items
-          .map((item) => ({
-            title: normalizeWhitespace(
-              getElementText(item, ["title"]) || "Untitled entry"
-            ),
-            href: normalizeWhitespace(getEntryHref(item, feed.url)),
-            summary: stripHtml(
-              getElementText(item, ["description", "summary", "content"]) || "No summary available."
-            ),
-            pubDate: normalizeWhitespace(
-              getElementText(item, ["pubDate", "published", "updated"]) || ""
-            )
-          }))
-          .filter((item) => matchesDateFilter(item.pubDate, dateFilter))
-      };
-    })
+  const feedRequests = feeds.map((feed, index) =>
+    fetchRssFeed(feed, dateFilter)
+      .then((result) => {
+        onFeedLoaded?.(result, index);
+        return result;
+      })
+      .catch((error) => {
+        onFeedFailed?.(feed, index, error);
+        throw error;
+      })
   );
+
+  const results = await Promise.allSettled(feedRequests);
 
   return {
     feeds: results
@@ -159,54 +179,29 @@ async function fetchRssFeeds(feeds, dateFilter) {
   };
 }
 
-function renderRssGrid(feeds) {
+function renderRssGrid(feeds, { loading = false } = {}) {
   els.rssGrid.innerHTML = "";
 
   if (feeds.length === 0) {
     renderEmptyState(els.rssGrid, "No RSS feeds saved yet. Add some from the extension popup.");
-    return;
+    return new Map();
   }
 
   const fragment = document.createDocumentFragment();
+  const cardMap = new Map();
 
-  feeds.forEach((feed) => {
-    const node = els.rssTemplate.content.firstElementChild.cloneNode(true);
-    node.querySelector("h3").textContent = feed.title;
-
-    const sourceLink = node.querySelector(".rss-source-link");
-    sourceLink.href = feed.url;
-
-    const itemsContainer = node.querySelector(".rss-items");
-
-    if (feed.items.length === 0) {
-      itemsContainer.innerHTML = '<div class="empty-state">No entries match the current filter.</div>';
-    } else {
-      feed.items.forEach((item) => {
-        const itemNode = document.createElement("a");
-        itemNode.className = "rss-item";
-        itemNode.href = item.href;
-        itemNode.target = "_blank";
-        itemNode.rel = "noreferrer";
-        itemNode.innerHTML = `
-          <strong>${escapeHtml(item.title)}</strong>
-          <span>${escapeHtml(item.summary)}</span>
-        `;
-        itemsContainer.appendChild(itemNode);
-      });
-    }
-
+  feeds.forEach((feed, index) => {
+    const node = createRssFeedNode(feed, { loading });
+    cardMap.set(index, node);
     fragment.appendChild(node);
   });
 
   els.rssGrid.appendChild(fragment);
+  return cardMap;
 }
 
 function renderEmptyState(container, message) {
   container.innerHTML = `<div class="empty-state">${escapeHtml(message)}</div>`;
-}
-
-function renderErrorState(container, message) {
-  container.innerHTML = `<div class="error-state">${escapeHtml(message)}</div>`;
 }
 
 function setStatus(message, tone) {
@@ -256,6 +251,109 @@ function openDateFilter() {
 
 function normalizeWhitespace(value) {
   return value.replace(/\s+/g, " ").trim();
+}
+
+async function fetchRssFeed(feed, dateFilter) {
+  const response = await fetch(feed.url);
+
+  if (!response.ok) {
+    throw new Error(`RSS request failed for ${feed.title} with status ${response.status}`);
+  }
+
+  const xml = await response.text();
+  const doc = new DOMParser().parseFromString(xml, "text/xml");
+  const items = getFeedEntries(doc);
+
+  return {
+    title: feed.title,
+    url: feed.url,
+    items: items
+      .map((item) => ({
+        title: normalizeWhitespace(
+          getElementText(item, ["title"]) || "Untitled entry"
+        ),
+        href: normalizeWhitespace(getEntryHref(item, feed.url)),
+        summary: stripHtml(
+          getElementText(item, ["description", "summary", "content"]) || "No summary available."
+        ),
+        pubDate: normalizeWhitespace(
+          getElementText(item, ["pubDate", "published", "updated"]) || ""
+        )
+      }))
+      .filter((item) => matchesDateFilter(item.pubDate, dateFilter))
+  };
+}
+
+function createRssFeedNode(feed, { loading = false } = {}) {
+  const node = els.rssTemplate.content.firstElementChild.cloneNode(true);
+  node.querySelector("h3").textContent = feed.title;
+
+  const sourceLink = node.querySelector(".rss-source-link");
+  sourceLink.href = feed.url;
+
+  if (loading) {
+    updateRssFeedCardLoading(node);
+    return node;
+  }
+
+  updateRssFeedCard(node, feed);
+  return node;
+}
+
+function updateRssFeedCard(node, feed) {
+  if (!node) {
+    return;
+  }
+
+  node.dataset.state = "ready";
+  const itemsContainer = getCardItemsContainer(node);
+  itemsContainer.innerHTML = "";
+
+  if (feed.items.length === 0) {
+    itemsContainer.innerHTML = '<div class="empty-state">No entries match the current filter.</div>';
+    return;
+  }
+
+  feed.items.forEach((item) => {
+    const itemNode = document.createElement("a");
+    itemNode.className = "rss-item";
+    itemNode.href = item.href;
+    itemNode.target = "_blank";
+    itemNode.rel = "noreferrer";
+    itemNode.innerHTML = `
+      <strong>${escapeHtml(item.title)}</strong>
+      <span>${escapeHtml(item.summary)}</span>
+    `;
+    itemsContainer.appendChild(itemNode);
+  });
+}
+
+function updateRssFeedCardLoading(node) {
+  node.dataset.state = "loading";
+  getCardItemsContainer(node).innerHTML = `
+    <div class="rss-loading-state" aria-live="polite">
+      <div class="rss-progress-track" aria-hidden="true">
+        <div class="rss-progress-bar"></div>
+      </div>
+      <p>Loading feed...</p>
+    </div>
+  `;
+}
+
+function updateRssFeedCardError(node, feed) {
+  if (!node) {
+    return;
+  }
+
+  node.dataset.state = "error";
+  const sourceLink = node.querySelector(".rss-source-link");
+  sourceLink.href = feed.url;
+  getCardItemsContainer(node).innerHTML =
+    '<div class="error-state">Unable to load this feed right now.</div>';
+}
+
+function getCardItemsContainer(node) {
+  return node.querySelector(".rss-items");
 }
 
 function stripHtml(value) {

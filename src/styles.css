@@ -392,6 +392,14 @@ h1 {
   scroll-snap-align: start;
 }
 
+.rss-card[data-state="loading"] .rss-card-header {
+  border-bottom-color: transparent;
+}
+
+.rss-card[data-state="error"] {
+  border-color: rgba(156, 101, 65, 0.28);
+}
+
 .rss-source-link,
 .rss-item {
   color: inherit;
@@ -430,6 +438,35 @@ h1 {
   overflow-y: auto;
   min-height: 0;
   align-content: start;
+}
+
+.rss-loading-state {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  padding-top: 2px;
+}
+
+.rss-loading-state p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.rss-progress-track {
+  position: relative;
+  overflow: hidden;
+  height: 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--border) 70%, transparent);
+}
+
+.rss-progress-bar {
+  position: absolute;
+  inset: 0 auto 0 -35%;
+  width: 35%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent 0%, var(--accent) 45%, transparent 100%);
+  animation: rss-progress-slide 1.2s ease-in-out infinite;
 }
 
 .rss-item {
@@ -482,6 +519,16 @@ h1 {
 
 .error-state {
   color: var(--warning);
+}
+
+@keyframes rss-progress-slide {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(320%);
+  }
 }
 
 @media (max-width: 960px) {
