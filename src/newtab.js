@@ -66,18 +66,22 @@ async function fetchRssFeeds(feeds, dateFilter) {
 
       const xml = await response.text();
       const doc = new DOMParser().parseFromString(xml, "text/xml");
-      const items = [...doc.querySelectorAll("item")];
+      const items = getFeedEntries(doc);
 
       return {
         title: feed.title,
         url: feed.url,
         items: items
           .map((item) => ({
-            title: normalizeWhitespace(item.querySelector("title")?.textContent || "Untitled entry"),
-            href: normalizeWhitespace(item.querySelector("link")?.textContent || feed.url),
-            summary: stripHtml(item.querySelector("description")?.textContent || "No summary available."),
+            title: normalizeWhitespace(
+              getElementText(item, ["title"]) || "Untitled entry"
+            ),
+            href: normalizeWhitespace(getEntryHref(item, feed.url)),
+            summary: stripHtml(
+              getElementText(item, ["description", "summary", "content"]) || "No summary available."
+            ),
             pubDate: normalizeWhitespace(
-              item.querySelector("pubDate, published, updated")?.textContent || ""
+              getElementText(item, ["pubDate", "published", "updated"]) || ""
             )
           }))
           .filter((item) => matchesDateFilter(item.pubDate, dateFilter))
@@ -175,6 +179,46 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
+}
+
+function getFeedEntries(doc) {
+  const rssItems = getElementsByLocalName(doc, "item");
+
+  if (rssItems.length > 0) {
+    return rssItems;
+  }
+
+  return getElementsByLocalName(doc, "entry");
+}
+
+function getEntryHref(entry, fallbackUrl) {
+  const links = getElementsByLocalName(entry, "link");
+  const preferredLink =
+    links.find((link) => link.getAttribute("rel") === "alternate" && link.getAttribute("href")) ||
+    links.find((link) => link.getAttribute("href")) ||
+    links[0];
+
+  if (!preferredLink) {
+    return getElementText(entry, ["id"]) || fallbackUrl;
+  }
+
+  return preferredLink.getAttribute("href") || preferredLink.textContent || fallbackUrl;
+}
+
+function getElementText(node, names) {
+  for (const name of names) {
+    const match = getElementsByLocalName(node, name)[0];
+
+    if (match?.textContent) {
+      return match.textContent;
+    }
+  }
+
+  return "";
+}
+
+function getElementsByLocalName(node, localName) {
+  return Array.from(node.getElementsByTagNameNS("*", localName));
 }
 
 function matchesDateFilter(pubDate, filter) {
