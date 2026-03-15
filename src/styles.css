@@ -515,7 +515,8 @@ h1 {
 }
 
 .rss-item strong,
-.rss-item span {
+.rss-item span,
+.rss-item time {
   min-width: 0;
   overflow: hidden;
   word-break: break-word;
@@ -528,6 +529,14 @@ h1 {
   line-clamp: 2;
   font-size: 1.05rem;
   line-height: 1.35;
+}
+
+.rss-item time {
+  display: block;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.2;
+  text-align: right;
 }
 
 .rss-item span {

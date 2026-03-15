@@ -320,9 +320,13 @@ function updateRssFeedCard(node, feed) {
     itemNode.href = item.href;
     itemNode.target = "_blank";
     itemNode.rel = "noreferrer";
+    const pubDateMarkup = item.pubDate
+      ? `<time class="rss-item-date">${escapeHtml(formatPubDate(item.pubDate))}</time>`
+      : "";
     itemNode.innerHTML = `
       <strong>${escapeHtml(item.title)}</strong>
       <span>${escapeHtml(item.summary)}</span>
+      ${pubDateMarkup}
     `;
     itemsContainer.appendChild(itemNode);
   });
@@ -354,6 +358,22 @@ function updateRssFeedCardError(node, feed) {
 
 function getCardItemsContainer(node) {
   return node.querySelector(".rss-items");
+}
+
+function formatPubDate(pubDate) {
+  const parsedDate = new Date(pubDate);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return pubDate;
+  }
+
+  return parsedDate.toLocaleString([], {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit"
+  });
 }
 
 function stripHtml(value) {
