@@ -86,7 +86,6 @@ h2 {
   line-height: 1.5;
 }
 
-.feed-form,
 .feed-list-section {
   margin-top: 18px;
   padding: 16px;
@@ -98,6 +97,15 @@ h2 {
 .feed-form {
   display: grid;
   gap: 12px;
+  margin: 0 0 16px;
+  padding: 16px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.feed-form[hidden] {
+  display: none;
 }
 
 .field {
@@ -146,6 +154,12 @@ h2 {
   gap: 12px;
 }
 
+.list-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .feed-count {
   min-width: 32px;
   height: 32px;
@@ -155,6 +169,35 @@ h2 {
   border-radius: 999px;
   background: var(--accent-soft);
   color: var(--accent);
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-strong);
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.icon-button.is-active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.icon-button-icon {
+  width: 16px;
+  height: 16px;
+  filter: var(--drag-handle-filter);
+  pointer-events: none;
 }
 
 .form-status {
@@ -273,13 +316,25 @@ h2 {
 
 .delete-button {
   flex-shrink: 0;
-  padding: 8px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
   background: #efe5d6;
   color: var(--danger);
 }
 
 :root[data-theme="dark"] .delete-button {
   background: rgba(241, 163, 136, 0.12);
+}
+
+.delete-button-icon {
+  width: 16px;
+  height: 16px;
+  filter: var(--drag-handle-filter);
+  pointer-events: none;
 }
 
 .empty-state {

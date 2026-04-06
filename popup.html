@@ -15,30 +15,42 @@
         <p class="popup-copy">Add or delete RSS feed links for your new tab dashboard.</p>
       </header>
 
-      <form id="feed-form" class="feed-form">
-        <label class="field">
-          <span>Name</span>
-          <input id="feed-title" name="title" type="text" placeholder="GitHub Blog" required />
-        </label>
-        <label class="field">
-          <span>RSS URL</span>
-          <input
-            id="feed-url"
-            name="url"
-            type="url"
-            placeholder="https://example.com/feed.xml"
-            required
-          />
-        </label>
-        <button class="primary-button" type="submit">Add feed</button>
-      </form>
-
       <section class="feed-list-section">
         <div class="list-header">
-          <h2>Saved feeds</h2>
-          <span id="feed-count" class="feed-count">0</span>
+          <div class="list-heading">
+            <h2>Saved feeds</h2>
+            <span id="feed-count" class="feed-count">0</span>
+          </div>
+          <button
+            id="toggle-feed-form"
+            class="icon-button"
+            type="button"
+            aria-expanded="false"
+            aria-controls="feed-form"
+            aria-label="Add feed"
+            title="Add feed"
+          >
+            <img src="./src/assets/svg/plus.svg" alt="" aria-hidden="true" class="icon-button-icon" />
+          </button>
         </div>
         <div id="form-status" class="form-status" aria-live="polite"></div>
+        <form id="feed-form" class="feed-form" hidden>
+          <label class="field">
+            <span>Name</span>
+            <input id="feed-title" name="title" type="text" placeholder="GitHub Blog" required />
+          </label>
+          <label class="field">
+            <span>RSS URL</span>
+            <input
+              id="feed-url"
+              name="url"
+              type="url"
+              placeholder="https://example.com/feed.xml"
+              required
+            />
+          </label>
+          <button class="primary-button" type="submit">Add feed</button>
+        </form>
         <div id="saved-feeds" class="saved-feeds"></div>
       </section>
     </main>
@@ -63,7 +75,9 @@
           <strong class="saved-feed-title"></strong>
           <a class="saved-feed-url" target="_blank" rel="noreferrer"></a>
         </div>
-        <button class="delete-button" type="button">Delete</button>
+        <button class="delete-button" type="button" aria-label="Delete feed" title="Delete feed">
+          <img src="./src/assets/svg/trash.svg" alt="" aria-hidden="true" class="delete-button-icon" />
+        </button>
       </article>
     </template>
 

@@ -8,6 +8,7 @@ import {
 
 const els = {
   form: document.querySelector("#feed-form"),
+  formToggle: document.querySelector("#toggle-feed-form"),
   titleInput: document.querySelector("#feed-title"),
   urlInput: document.querySelector("#feed-url"),
   formStatus: document.querySelector("#form-status"),
@@ -19,6 +20,10 @@ const els = {
 let feeds = [];
 let draggedFeedUrl = null;
 let hasFeedOrderChanged = false;
+
+els.formToggle.addEventListener("click", () => {
+  setFeedFormOpen(els.form.hidden);
+});
 
 els.form.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -42,6 +47,7 @@ els.form.addEventListener("submit", async (event) => {
   ]);
 
   els.form.reset();
+  setFeedFormOpen(false);
   renderFeeds();
   setStatus("Feed added.", "success");
 });
@@ -108,6 +114,16 @@ function renderFeeds() {
 function setStatus(message, tone) {
   els.formStatus.textContent = message;
   els.formStatus.dataset.tone = tone;
+}
+
+function setFeedFormOpen(isOpen) {
+  els.form.hidden = !isOpen;
+  els.formToggle.setAttribute("aria-expanded", String(isOpen));
+  els.formToggle.classList.toggle("is-active", isOpen);
+
+  if (isOpen) {
+    els.titleInput.focus();
+  }
 }
 
 function normalizeUrl(value) {
