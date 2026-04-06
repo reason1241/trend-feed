@@ -7,6 +7,7 @@ import {
 } from "./storage.js";
 
 const els = {
+  feedListSection: document.querySelector(".feed-list-section"),
   form: document.querySelector("#feed-form"),
   formToggle: document.querySelector("#toggle-feed-form"),
   titleInput: document.querySelector("#feed-title"),
@@ -23,6 +24,25 @@ let hasFeedOrderChanged = false;
 
 els.formToggle.addEventListener("click", () => {
   setFeedFormOpen(els.form.hidden);
+});
+
+document.addEventListener("click", (event) => {
+  if (els.form.hidden) {
+    return;
+  }
+
+  if (els.form.contains(event.target) || els.formToggle.contains(event.target)) {
+    return;
+  }
+
+  setFeedFormOpen(false);
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !els.form.hidden) {
+    setFeedFormOpen(false);
+    els.formToggle.focus();
+  }
 });
 
 els.form.addEventListener("submit", async (event) => {
@@ -120,6 +140,7 @@ function setFeedFormOpen(isOpen) {
   els.form.hidden = !isOpen;
   els.formToggle.setAttribute("aria-expanded", String(isOpen));
   els.formToggle.classList.toggle("is-active", isOpen);
+  els.feedListSection.classList.toggle("has-open-form", isOpen);
 
   if (isOpen) {
     els.titleInput.focus();
