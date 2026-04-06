@@ -45,6 +45,20 @@
 
     <template id="saved-feed-template">
       <article class="saved-feed-card">
+        <button
+          class="drag-handle"
+          type="button"
+          draggable="true"
+          aria-label="Reorder feed"
+          title="Drag to reorder"
+        >
+          <img
+            class="drag-handle-icon"
+            src="./src/assets/svg/reorder.svg"
+            alt=""
+            aria-hidden="true"
+          />
+        </button>
         <div class="saved-feed-copy">
           <strong class="saved-feed-title"></strong>
           <a class="saved-feed-url" target="_blank" rel="noreferrer"></a>
