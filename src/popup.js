@@ -9,6 +9,7 @@ import {
 const els = {
   feedListSection: document.querySelector(".feed-list-section"),
   form: document.querySelector("#feed-form"),
+  formInlineStatus: document.querySelector("#feed-form-status"),
   formToggle: document.querySelector("#toggle-feed-form"),
   titleInput: document.querySelector("#feed-title"),
   urlInput: document.querySelector("#feed-url"),
@@ -21,6 +22,8 @@ const els = {
 let feeds = [];
 let draggedFeedUrl = null;
 let hasFeedOrderChanged = false;
+let autoScrollFrame = 0;
+let lastDragPointerY = 0;
 
 els.formToggle.addEventListener("click", () => {
   setFeedFormOpen(els.form.hidden);
@@ -45,6 +48,19 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+document.addEventListener("dragover", (event) => {
+  if (!draggedFeedUrl) {
+    return;
+  }
+
+  lastDragPointerY = event.clientY;
+  event.preventDefault();
+});
+
+document.addEventListener("drop", () => {
+  stopAutoScroll();
+});
+
 els.form.addEventListener("submit", async (event) => {
   event.preventDefault();
 
@@ -52,12 +68,12 @@ els.form.addEventListener("submit", async (event) => {
   const url = normalizeUrl(els.urlInput.value.trim());
 
   if (!title || !url) {
-    setStatus("Enter both a name and a valid RSS URL.", "error");
+    setFormStatus("Enter both a name and a valid RSS URL.", "error");
     return;
   }
 
   if (feeds.some((feed) => feed.url === url)) {
-    setStatus("That RSS feed is already saved.", "error");
+    setFormStatus("That RSS feed is already saved.", "error");
     return;
   }
 
@@ -67,9 +83,10 @@ els.form.addEventListener("submit", async (event) => {
   ]);
 
   els.form.reset();
+  setFormStatus("", "");
   setFeedFormOpen(false);
   renderFeeds();
-  setStatus("Feed added.", "success");
+  setListStatus("Feed added.", "success");
 });
 
 void init();
@@ -110,18 +127,20 @@ function renderFeeds() {
   feeds.forEach((feed, index) => {
     const node = els.template.content.firstElementChild.cloneNode(true);
     node.dataset.feedUrl = feed.url;
-    node.querySelector(".saved-feed-title").textContent = feed.title;
+    const titleNode = node.querySelector(".saved-feed-title");
+    titleNode.textContent = feed.title;
 
     const urlLink = node.querySelector(".saved-feed-url");
     urlLink.textContent = feed.url;
     urlLink.href = feed.url;
 
     setupDragAndDrop(node, feed.url);
+    setupTitleEditing(node, feed);
 
     node.querySelector(".delete-button").addEventListener("click", async () => {
       feeds = await saveStoredRssFeeds(feeds.filter((_, feedIndex) => feedIndex !== index));
       renderFeeds();
-      setStatus("Feed deleted.", "success");
+      setListStatus("Feed deleted.", "success");
     });
 
     fragment.appendChild(node);
@@ -131,9 +150,14 @@ function renderFeeds() {
   animateFeedPositions(previousRects);
 }
 
-function setStatus(message, tone) {
+function setListStatus(message, tone) {
   els.formStatus.textContent = message;
   els.formStatus.dataset.tone = tone;
+}
+
+function setFormStatus(message, tone) {
+  els.formInlineStatus.textContent = message;
+  els.formInlineStatus.dataset.tone = tone;
 }
 
 function setFeedFormOpen(isOpen) {
@@ -143,7 +167,10 @@ function setFeedFormOpen(isOpen) {
   els.feedListSection.classList.toggle("has-open-form", isOpen);
 
   if (isOpen) {
+    setFormStatus("", "");
     els.titleInput.focus();
+  } else {
+    setFormStatus("", "");
   }
 }
 
@@ -165,9 +192,11 @@ function setupDragAndDrop(node, feedUrl) {
   handle.addEventListener("dragstart", (event) => {
     draggedFeedUrl = feedUrl;
     hasFeedOrderChanged = false;
+    lastDragPointerY = event.clientY;
     event.dataTransfer.effectAllowed = "move";
     event.dataTransfer.setData("text/plain", feedUrl);
     node.classList.add("is-dragging");
+    startAutoScroll();
     queueMicrotask(() => {
       node.classList.add("is-hidden-during-drag");
     });
@@ -177,11 +206,12 @@ function setupDragAndDrop(node, feedUrl) {
     const shouldPersistOrder = Boolean(draggedFeedUrl) && hasFeedOrderChanged;
     draggedFeedUrl = null;
     hasFeedOrderChanged = false;
+    stopAutoScroll();
     clearDragState();
 
     if (shouldPersistOrder) {
       feeds = await saveStoredRssFeeds(feeds);
-      setStatus("Feed order updated.", "success");
+      setListStatus("Feed order updated.", "success");
     }
   });
 
@@ -192,6 +222,7 @@ function setupDragAndDrop(node, feedUrl) {
 
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
+    lastDragPointerY = event.clientY;
 
     const direction = getDropDirection(node, event.clientY);
     updateDropHighlight(node, direction);
@@ -210,8 +241,86 @@ function setupDragAndDrop(node, feedUrl) {
     }
 
     event.preventDefault();
+    lastDragPointerY = event.clientY;
     node.classList.remove("drop-before", "drop-after");
   });
+}
+
+function setupTitleEditing(node, feed) {
+  const titleNode = node.querySelector(".saved-feed-title");
+
+  titleNode.addEventListener("dblclick", () => {
+    beginTitleEditing(titleNode, feed);
+  });
+}
+
+function beginTitleEditing(titleNode, feed) {
+  if (titleNode.querySelector(".saved-feed-title-input")) {
+    return;
+  }
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = "saved-feed-title-input";
+  input.value = feed.title;
+  input.setAttribute("aria-label", "Feed name");
+
+  let didSubmit = false;
+
+  const cancelEdit = () => {
+    titleNode.textContent = feed.title;
+  };
+
+  const commitEdit = async () => {
+    if (didSubmit) {
+      return;
+    }
+
+    didSubmit = true;
+    const nextTitle = input.value.trim();
+
+    if (!nextTitle) {
+      cancelEdit();
+      setListStatus("Feed name cannot be empty.", "error");
+      return;
+    }
+
+    if (nextTitle === feed.title) {
+      cancelEdit();
+      return;
+    }
+
+    const nextFeeds = feeds.map((entry) =>
+      entry.url === feed.url ? { ...entry, title: nextTitle } : entry
+    );
+    feeds = await saveStoredRssFeeds(nextFeeds);
+    setListStatus("Feed name updated.", "success");
+  };
+
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      void commitEdit();
+      return;
+    }
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      didSubmit = true;
+      cancelEdit();
+    }
+  });
+
+  input.addEventListener("blur", () => {
+    if (!didSubmit) {
+      void commitEdit();
+    }
+  });
+
+  titleNode.textContent = "";
+  titleNode.appendChild(input);
+  input.focus();
+  input.select();
 }
 
 function moveFeed(sourceUrl, targetUrl, direction) {
@@ -266,6 +375,55 @@ function clearDragState() {
   els.savedFeeds.querySelectorAll(".saved-feed-card").forEach((node) => {
     node.classList.remove("is-dragging", "is-hidden-during-drag", "drop-before", "drop-after");
   });
+}
+
+function startAutoScroll() {
+  if (autoScrollFrame) {
+    return;
+  }
+
+  const tick = () => {
+    autoScrollFrame = 0;
+
+    if (!draggedFeedUrl) {
+      return;
+    }
+
+    const scrollDelta = getAutoScrollDelta(lastDragPointerY);
+
+    if (scrollDelta !== 0) {
+      window.scrollBy(0, scrollDelta);
+    }
+
+    autoScrollFrame = window.requestAnimationFrame(tick);
+  };
+
+  autoScrollFrame = window.requestAnimationFrame(tick);
+}
+
+function stopAutoScroll() {
+  if (!autoScrollFrame) {
+    return;
+  }
+
+  window.cancelAnimationFrame(autoScrollFrame);
+  autoScrollFrame = 0;
+}
+
+function getAutoScrollDelta(pointerY) {
+  const viewportHeight = window.innerHeight;
+  const edgeThreshold = 56;
+  const maxStep = 16;
+
+  if (pointerY < edgeThreshold) {
+    return -Math.ceil(((edgeThreshold - pointerY) / edgeThreshold) * maxStep);
+  }
+
+  if (pointerY > viewportHeight - edgeThreshold) {
+    return Math.ceil(((pointerY - (viewportHeight - edgeThreshold)) / edgeThreshold) * maxStep);
+  }
+
+  return 0;
 }
 
 function captureFeedPositions() {

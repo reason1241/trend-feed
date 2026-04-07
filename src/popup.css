@@ -230,15 +230,34 @@ h2 {
   font-size: 0.92rem;
 }
 
+.feed-form-status {
+  min-height: 1.2em;
+  margin: -2px 0 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
 .form-status:empty {
   display: none;
+}
+
+.feed-form-status:empty {
+  visibility: hidden;
 }
 
 .form-status[data-tone="error"] {
   color: var(--danger);
 }
 
+.feed-form-status[data-tone="error"] {
+  color: var(--danger);
+}
+
 .form-status[data-tone="success"] {
+  color: var(--success);
+}
+
+.feed-form-status[data-tone="success"] {
   color: var(--success);
 }
 
@@ -309,6 +328,23 @@ h2 {
 
 .saved-feed-title {
   font-size: 0.96rem;
+}
+
+.saved-feed-title-input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 6px 8px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+}
+
+.saved-feed-title-input:focus {
+  outline: 2px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  outline-offset: 1px;
 }
 
 .drag-handle {
