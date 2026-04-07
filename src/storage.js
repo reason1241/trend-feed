@@ -23,7 +23,7 @@ export async function loadStoredRssFeeds() {
   const result = await chrome.storage.local.get(RSS_STORAGE_KEY);
   const feeds = result[RSS_STORAGE_KEY];
 
-  if (!Array.isArray(feeds) || feeds.length === 0) {
+  if (!Array.isArray(feeds)) {
     await chrome.storage.local.set({
       [RSS_STORAGE_KEY]: DEFAULT_RSS_FEEDS
     });

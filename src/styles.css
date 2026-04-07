@@ -379,6 +379,14 @@ h1 {
   scroll-snap-type: x proximity;
 }
 
+.rss-grid.is-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 0;
+}
+
 .rss-card {
   padding: 0;
   border-radius: var(--radius-md);
@@ -552,6 +560,41 @@ h1 {
   border-radius: var(--radius-md);
   background: var(--surface-strong);
   color: var(--muted);
+}
+
+.empty-state-rich {
+  width: min(760px, 100%);
+  min-height: 100%;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 12px;
+  padding: clamp(28px, 6vw, 56px);
+  text-align: center;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.empty-state-rich h3 {
+  max-width: 18ch;
+  font-size: clamp(1.7rem, 2.8vw, 2.4rem);
+  line-height: 1.05;
+}
+
+.empty-state-rich p {
+  margin: 0;
+  max-width: 52ch;
+  font-size: 1.02rem;
+  line-height: 1.65;
+}
+
+.empty-state-welcome {
+  background: transparent;
+}
+
+:root[data-theme="dark"] .empty-state-welcome {
+  background: transparent;
 }
 
 .error-state {

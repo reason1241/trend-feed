@@ -116,7 +116,12 @@ async function loadDashboard() {
   updateRssCount(rssFeeds.length);
 
   if (rssFeeds.length === 0) {
-    renderEmptyState(els.rssGrid, "No RSS feeds saved yet. Add some from the extension popup.");
+    renderEmptyState(els.rssGrid, {
+      tone: "welcome",
+      title: "No RSS feeds yet",
+      body:
+        'Search the site name plus "RSS", click the TF icon in the Chrome toolbar, then paste the feed URL. Congratulations, you now collect the internet professionally.'
+    });
     setStatus("Updated", "success");
     return;
   }
@@ -181,9 +186,15 @@ async function fetchRssFeeds(feeds, dateFilter, { onFeedLoaded, onFeedFailed } =
 
 function renderRssGrid(feeds, { loading = false } = {}) {
   els.rssGrid.innerHTML = "";
+  els.rssGrid.classList.remove("is-empty");
 
   if (feeds.length === 0) {
-    renderEmptyState(els.rssGrid, "No RSS feeds saved yet. Add some from the extension popup.");
+    renderEmptyState(els.rssGrid, {
+      tone: "welcome",
+      title: "No RSS feeds yet",
+      body:
+        'Search the site name plus "RSS", click the TF icon in the Chrome toolbar, then paste the feed URL. Congratulations, you now collect the internet professionally.'
+    });
     return new Map();
   }
 
@@ -200,8 +211,24 @@ function renderRssGrid(feeds, { loading = false } = {}) {
   return cardMap;
 }
 
-function renderEmptyState(container, message) {
-  container.innerHTML = `<div class="empty-state">${escapeHtml(message)}</div>`;
+function renderEmptyState(container, content) {
+  container.classList.add("is-empty");
+
+  if (typeof content === "string") {
+    container.innerHTML = `<div class="empty-state">${escapeHtml(content)}</div>`;
+    return;
+  }
+
+  const title = escapeHtml(content.title ?? "");
+  const body = escapeHtml(content.body ?? "");
+  const toneClass = content.tone ? ` empty-state-${escapeHtml(content.tone)}` : "";
+
+  container.innerHTML = `
+    <section class="empty-state empty-state-rich${toneClass}">
+      <h3>${title}</h3>
+      <p>${body}</p>
+    </section>
+  `;
 }
 
 function setStatus(message, tone) {
