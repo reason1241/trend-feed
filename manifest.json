@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "trend-feed",
+  "name": "Trend Feed",
   "version": "0.1.0",
   "description": "A Chrome new tab RSS dashboard with a simple feed manager.",
   "permissions": [
