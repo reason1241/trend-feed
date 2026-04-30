@@ -1,6 +1,7 @@
 # trend-feed
-
+[Demo Link](https://mschoi.com/trend-feed/)
 A Chrome extension that replaces the default new tab page with an RSS feed dashboard.
+
 
 ## Screenshot
 - Default
@@ -33,9 +34,3 @@ This starter is intentionally simple:
 - `newtab.html`: new tab entry page
 - `src/newtab.js`: dashboard app logic
 - `src/styles.css`: dashboard styles
-
-## Next steps
-
-- Add feed health/error details in the popup
-- Add saved feed presets
-- Add layout customization and pinning
