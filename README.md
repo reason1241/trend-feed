@@ -1,5 +1,6 @@
-# trend-feed
-[Demo Link](https://mschoi.com/trend-feed/)
+# Trend Feed
+- [Chrome Web Store](https://chromewebstore.google.com/detail/ncnolinnebbkkjhcnhjihjfilnjchlib?utm_source=item-share-cb)
+- [Demo Link](https://mschoi.com/trend-feed/)
 A Chrome extension that replaces the default new tab page with an RSS feed dashboard.
 
 
