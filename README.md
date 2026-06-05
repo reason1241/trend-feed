@@ -64,7 +64,7 @@ The package is written to `dist/trend-feed-v<manifest-version>.zip` and includes
 - `icons/`
 - `src/`
 
-GitHub Releases also build and attach this zip automatically when a release is published.
+When changes are pushed or merged to `main`, GitHub Actions reads the version from `manifest.json`, creates a matching `v<version>` tag, creates a GitHub Release, and attaches the zip. If that tag already exists, the workflow fails so the manifest version can be bumped before releasing.
 
 ## Load in Chrome
 
