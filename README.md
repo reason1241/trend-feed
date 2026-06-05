@@ -48,6 +48,24 @@ node --test test/feed-support.test.mjs
 
 The test requires network access and `xmllint`.
 
+## Release zip
+
+Create a Chrome Web Store-ready zip with only extension runtime files:
+
+```sh
+./scripts/package-extension.sh
+```
+
+The package is written to `dist/trend-feed-v<manifest-version>.zip` and includes only:
+
+- `manifest.json`
+- `newtab.html`
+- `popup.html`
+- `icons/`
+- `src/`
+
+GitHub Releases also build and attach this zip automatically when a release is published.
+
 ## Load in Chrome
 
 1. Open `chrome://extensions`
