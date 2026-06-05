@@ -1,8 +1,8 @@
 name: Release
 
 on:
-  release:
-    types: [published]
+  push:
+    branches: [main]
 
 permissions:
   contents: write
@@ -14,11 +14,43 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read manifest version
+        id: version
+        run: |
+          VERSION="$(node -e 'console.log(JSON.parse(require("fs").readFileSync("manifest.json", "utf8")).version)')"
+          TAG="v$VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Check release tag
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/${{ steps.version.outputs.tag }}" >/dev/null 2>&1; then
+            echo "Tag ${{ steps.version.outputs.tag }} already exists. Bump manifest.json version before merging to main."
+            exit 1
+          fi
 
       - name: Package extension
         run: ./scripts/package-extension.sh
 
-      - name: Upload release asset
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: trend-feed-extension
+          path: dist/*.zip
+
+      - name: Create tag
+        run: |
+          git tag "${{ steps.version.outputs.tag }}"
+          git push origin "${{ steps.version.outputs.tag }}"
+
+      - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "${{ github.event.release.tag_name }}" dist/*.zip --clobber
+        run: |
+          gh release create "${{ steps.version.outputs.tag }}" \
+            dist/*.zip \
+            --title "${{ steps.version.outputs.tag }}" \
+            --notes "Trend Feed ${{ steps.version.outputs.version }}"
