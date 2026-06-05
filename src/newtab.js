@@ -301,10 +301,10 @@ async function fetchRssFeed(feed, dateFilter) {
         ),
         href: normalizeWhitespace(getEntryHref(item, feed.url)),
         summary: stripHtml(
-          getElementText(item, ["description", "summary", "content"]) || "No summary available."
+          getElementText(item, ["description", "summary", "content", "encoded"]) || "No summary available."
         ),
         pubDate: normalizeWhitespace(
-          getElementText(item, ["pubDate", "published", "updated"]) || ""
+          getElementText(item, ["pubDate", "published", "updated", "date"]) || ""
         )
       }))
       .filter((item) => matchesDateFilter(item.pubDate, dateFilter))
@@ -435,7 +435,7 @@ function getEntryHref(entry, fallbackUrl) {
     links[0];
 
   if (!preferredLink) {
-    return getElementText(entry, ["id"]) || fallbackUrl;
+    return entry.getAttribute("rdf:about") || getElementText(entry, ["id"]) || fallbackUrl;
   }
 
   return preferredLink.getAttribute("href") || preferredLink.textContent || fallbackUrl;

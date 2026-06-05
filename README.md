@@ -22,6 +22,32 @@ This starter is intentionally simple:
 - Client-side RSS XML fetching and rendering
 - Responsive dashboard UI
 
+## Supported feed formats
+
+Trend Feed currently supports common XML feed shapes that expose entries with `item` or `entry` elements:
+
+- RSS 2.0 feeds with `title`, `link`, `description`, and `pubDate`
+- RSS 1.0/RDF feeds with `item`, `link` or `rdf:about`, `content:encoded`, and `dc:date`
+- Atom feeds with `entry`, `title`, `link href`, `summary` or `content`, and `published` or `updated`
+
+Live smoke coverage is included for:
+
+- RSS 1.0/RDF: `https://equallove-2017.blog.jp/index.rdf`
+- RSS 2.0: `https://hnrss.org/newest`
+- Atom: `https://feeds.feedburner.com/geeknews-feed`
+- RSS 2.0: `https://feeds.content.dowjones.io/public/rss/RSSMarketsMain`
+- RSS 2.0: `https://www.investing.com/rss/news_301.rss`
+
+## Tests
+
+Run the live feed compatibility smoke test:
+
+```sh
+node --test test/feed-support.test.mjs
+```
+
+The test requires network access and `xmllint`.
+
 ## Load in Chrome
 
 1. Open `chrome://extensions`
