@@ -1,7 +1,8 @@
 # Trend Feed
+
 - [Chrome Web Store](https://chromewebstore.google.com/detail/ncnolinnebbkkjhcnhjihjfilnjchlib?utm_source=item-share-cb)
 - [Demo Link](https://mschoi.com/trend-feed/)
-- A Chrome extension that replaces the default new tab page with an RSS feed dashboard.
+- A browser extension for Chrome and Microsoft Edge that replaces the default new tab page with an RSS feed dashboard.
 
 
 ## Screenshot
@@ -48,15 +49,22 @@ node --test test/feed-support.test.mjs
 
 The test requires network access and `xmllint`.
 
-## Release zip
+## Release zips
 
-Create a Chrome Web Store-ready zip with only extension runtime files:
+Create a Chrome Web Store-ready zip:
 
 ```sh
 ./scripts/package-extension.sh
 ```
 
-The package is written to `dist/trend-feed-v<manifest-version>.zip` and includes only:
+Create a Microsoft Edge Add-ons-ready zip:
+
+```sh
+./scripts/package-edge-extension.sh
+```
+
+The packages are written to `dist/trend-feed-v<manifest-version>.zip` and
+`dist/trend-feed-edge-v<manifest-version>.zip`. Each includes only:
 
 - `manifest.json`
 - `newtab.html`
@@ -64,7 +72,9 @@ The package is written to `dist/trend-feed-v<manifest-version>.zip` and includes
 - `icons/`
 - `src/`
 
-When changes are pushed or merged to `main`, GitHub Actions reads the version from `manifest.json`, creates a matching `v<version>` tag, creates a GitHub Release, and attaches the zip. If that tag already exists, the workflow fails so the manifest version can be bumped before releasing.
+The Edge package copies `manifest.edge.json` into the archive as `manifest.json`, as required by Microsoft Edge Add-ons. Keep the versions in both manifests synchronized.
+
+When changes are pushed or merged to `main`, GitHub Actions reads the version from `manifest.json`, creates a matching `v<version>` tag, creates a GitHub Release, and attaches both zips. If that tag already exists, the workflow fails so the manifest version can be bumped before releasing.
 
 ## Load in Chrome
 
@@ -73,9 +83,18 @@ When changes are pushed or merged to `main`, GitHub Actions reads the version fr
 3. Click Load unpacked
 4. Select this project folder
 
+## Load in Microsoft Edge
+
+1. Run `./scripts/package-edge-extension.sh`
+2. Open `edge://extensions`
+3. Enable Developer mode
+4. Click Load unpacked
+5. Select the generated `dist/trend-feed-edge` folder
+
 ## Project structure
 
 - `manifest.json`: Chrome extension manifest
+- `manifest.edge.json`: Microsoft Edge extension manifest
 - `newtab.html`: new tab entry page
 - `src/newtab.js`: dashboard app logic
 - `src/styles.css`: dashboard styles
