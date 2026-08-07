@@ -120,7 +120,7 @@ async function loadDashboard() {
       tone: "welcome",
       title: "No RSS feeds yet",
       body:
-        'Search the site name plus "RSS", click the TF icon in the Chrome toolbar, then paste the feed URL. Congratulations, you now collect the internet professionally.'
+        'Search the site name plus "RSS", click the TF icon in the browser toolbar, then paste the feed URL. Congratulations, you now collect the internet professionally.'
     });
     setStatus("Updated", "success");
     return;
@@ -193,7 +193,7 @@ function renderRssGrid(feeds, { loading = false } = {}) {
       tone: "welcome",
       title: "No RSS feeds yet",
       body:
-        'Search the site name plus "RSS", click the TF icon in the Chrome toolbar, then paste the feed URL. Congratulations, you now collect the internet professionally.'
+        'Search the site name plus "RSS", click the TF icon in the browser toolbar, then paste the feed URL. Congratulations, you now collect the internet professionally.'
     });
     return new Map();
   }
