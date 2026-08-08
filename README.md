@@ -1,6 +1,7 @@
 # Trend Feed
 
 - [Chrome Web Store](https://chromewebstore.google.com/detail/ncnolinnebbkkjhcnhjihjfilnjchlib?utm_source=item-share-cb)
+- [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/trend-feed/gaaedjnonoefcoblhengncfcdkhimogi)
 - [Demo Link](https://mschoi.com/trend-feed/)
 - A browser extension for Chrome and Microsoft Edge that replaces the default new tab page with an RSS feed dashboard.
 
