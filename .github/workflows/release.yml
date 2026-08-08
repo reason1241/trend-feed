@@ -3,6 +3,15 @@ name: Release
 on:
   push:
     branches: [main]
+    paths:
+      - "manifest.json"
+      - "manifest.edge.json"
+      - "newtab.html"
+      - "popup.html"
+      - "icons/**"
+      - "src/**"
+      - "scripts/package-extension.sh"
+      - "scripts/package-edge-extension.sh"
 
 permissions:
   contents: write
